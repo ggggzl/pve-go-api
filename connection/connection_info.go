@@ -1,4 +1,4 @@
-package api
+package connection
 
 // Example yml file //
 // address: 192.0.2.12

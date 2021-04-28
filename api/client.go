@@ -1,40 +1,37 @@
 package api
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/Funkit/pve-go-api/connection"
 )
 
 // Client http.Client and connection information
 type Client struct {
 	httpClient *http.Client
-	info       Info
+	info       connection.Info
 }
 
 //NewClient create new client with TLS check disabled and information to log with a token to the API
-func NewClient(c Info) *Client {
-	tr := &http.Transport{
-		TLSClientConfig:   &tls.Config{InsecureSkipVerify: true},
-		ForceAttemptHTTP2: true,
-	}
-	httpClient := &http.Client{Transport: tr}
+func NewClient(i connection.Info, transportSettings *http.Transport) *Client {
+	httpClient := &http.Client{Transport: transportSettings}
 
 	client := &Client{
 		httpClient: httpClient,
-		info:       c,
+		info:       i,
 	}
 
 	return client
 }
 
-func tokenHeader(c Info) string {
+func tokenHeader(c connection.Info) string {
 	return "PVEAPIToken=" + c.UserID.Username + "@" + c.UserID.IDRealm + "!" + c.APIToken.ID + "=" + c.APIToken.Token
 }
 
-func newRequest(c Info, targetURL string) (*http.Request, error) {
+func newRequest(c connection.Info, targetURL string) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodGet, c.Address+targetURL, nil)
 	if err != nil {
 		return nil, err
@@ -44,6 +41,25 @@ func newRequest(c Info, targetURL string) (*http.Request, error) {
 }
 
 func (c *Client) get(url string) (responseBody []byte, err error) {
+	req, err := newRequest(c.info, url)
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer response.Body.Close()
+
+	respBody, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return respBody, nil
+}
+func (c *Client) Get(url string) (responseBody []byte, err error) {
 	req, err := newRequest(c.info, url)
 	if err != nil {
 		return nil, err
