@@ -8,6 +8,7 @@ import (
 	"github.com/Funkit/pve-go-api/connection"
 )
 
+//getData returns raw JSON data for structure-specific unmarshalling
 func (c *Client) getData(url string) ([]*json.RawMessage, error) {
 	respBody, err := c.get(url)
 	if err != nil {
@@ -17,6 +18,7 @@ func (c *Client) getData(url string) ([]*json.RawMessage, error) {
 	return extractData(respBody)
 }
 
+//get returns the query answer body as a byte array
 func (c *Client) get(url string) (responseBody []byte, err error) {
 	req, err := newRequest(c.info, url)
 	if err != nil {
@@ -37,6 +39,7 @@ func (c *Client) get(url string) (responseBody []byte, err error) {
 	return respBody, nil
 }
 
+//newRequest build a request with the token-based Authorization header
 func newRequest(c connection.Info, targetURL string) (*http.Request, error) {
 	req, err := http.NewRequest(http.MethodGet, c.Address+targetURL, nil)
 	if err != nil {
