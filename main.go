@@ -10,7 +10,7 @@ import (
 	"github.com/Funkit/pve-go-api/connection"
 )
 
-const secretsFilePath = "../secrets.yml"
+const secretsFilePath = "../secrets/secrets.yml"
 
 func main() {
 	var tokenInfo connection.Info
@@ -24,10 +24,17 @@ func main() {
 		ForceAttemptHTTP2: true,
 	})
 
-	rawResults, err := pveClient.GetRawResponse("/nodes")
+	rawResults, err := pveClient.GetNodes()
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(rawResults)
+
+	resources, err := pveClient.GetRawResponse("/cluster/resources")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(resources)
 }

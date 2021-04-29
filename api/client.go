@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/Funkit/pve-go-api/common"
 	"github.com/Funkit/pve-go-api/connection"
 )
 
@@ -59,7 +60,8 @@ func (c *Client) get(url string) (responseBody []byte, err error) {
 
 	return respBody, nil
 }
-func (c *Client) Get(url string) (responseBody []byte, err error) {
+
+func (c *Client) getData(url string) ([]*json.RawMessage, error) {
 	req, err := newRequest(c.info, url)
 	if err != nil {
 		return nil, err
@@ -76,7 +78,7 @@ func (c *Client) Get(url string) (responseBody []byte, err error) {
 		return nil, err
 	}
 
-	return respBody, nil
+	return common.GetRawData(respBody)
 }
 
 //GetRawResponse query the API endpoint and return the response body before serialization
@@ -97,27 +99,30 @@ func (c *Client) GetRawResponse(url string) (*Results, error) {
 
 //GetNodes query the /nodes URL on the Proxmox API
 func (c *Client) GetNodes() ([]Node, error) {
-	respBody, err := c.get("/nodes")
+	rawData, err := c.getData("/nodes")
 	if err != nil {
 		return nil, err
 	}
 
-	nodeList, err := parseNodes(respBody)
-	if err != nil {
-		return nil, err
+	var nodeList []Node
+	for _, element := range rawData {
+		var node Node
+		if err = json.Unmarshal(*element, &node); err != nil {
+			return nil, err
+		}
+		nodeList = append(nodeList, node)
 	}
-
-	return nodeList, nil
+	return nodeList, err
 }
 
 //GetClusterResources query the /cluster/resources URL on the Proxmox API
 func (c *Client) GetClusterResources() ([]NodeResource, []VMResource, error) {
-	respBody, err := c.get("/cluster/resources")
+	rawData, err := c.getData("/cluster/resources")
 	if err != nil {
 		return nil, nil, err
 	}
 
-	nodeList, vmList, err := parseClusterResources(respBody)
+	nodeList, vmList, err := parseClusterResources(rawData)
 	if err != nil {
 		log.Fatal(err)
 	}
