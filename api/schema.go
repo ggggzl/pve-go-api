@@ -38,16 +38,17 @@ func (node *NodeNetworkInterface) ParseMap(element map[string]interface{}) error
 
 //Resource resource at /cluster/resources
 type Resource struct {
-	Name              string  `json:"name,omitempty"`
-	Node              string  `json:"node"`
-	ID                string  `json:"id"`
-	Status            string  `json:"status"`
-	CPU               float64 `json:"cpu"` // %
 	AllocatedCPU      float64 `json:"maxcpu"`
 	AllocatedRAMBytes int     `json:"maxmem"` // bytes
-	RAM               int     `json:"mem"`    // bytes
+	CPU               float64 `json:"cpu"`    // %
+	ID                string  `json:"id"`
+	Name              string  `json:"name,omitempty"`
+	Node              string  `json:"node"`
+	Pool              string  `json:"pool,omitempty"`
+	RAM               int     `json:"mem"` // bytes
+	Status            string  `json:"status"`
+	Template          int     `json:"template,omitempty"`
+	Type              int     `json:"type,omitempty"`
 	Uptime            int     `json:"uptime"` // sec
 	VMID              int     `json:"vmid,omitempty"`
-	Pool              string  `json:"pool,omitempty"`
-	Template          int     `json:"template,omitempty"`
 }
