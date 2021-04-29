@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/Funkit/pve-go-api/common"
@@ -81,20 +80,19 @@ func (c *Client) getData(url string) ([]*json.RawMessage, error) {
 	return common.GetRawData(respBody)
 }
 
-//GetRawResponse query the API endpoint and return the response body before serialization
-func (c *Client) GetRawResponse(url string) (*Results, error) {
+//GetRawResponse query the API endpoint and return a map containing the response body
+func (c *Client) GetRawResponse(url string) (interface{}, error) {
 	respBody, err := c.get(url)
 	if err != nil {
 		return nil, err
 	}
 
-	var buffer Results
+	var result map[string]interface{}
 
-	if err := json.Unmarshal([]byte(respBody), &buffer); err != nil {
+	if err := json.Unmarshal(respBody, &result); err != nil {
 		return nil, err
 	}
-
-	return &buffer, nil
+	return &result, nil
 }
 
 //GetNodes query the /nodes URL on the Proxmox API
@@ -116,31 +114,39 @@ func (c *Client) GetNodes() ([]Node, error) {
 }
 
 //GetClusterResources query the /cluster/resources URL on the Proxmox API
-func (c *Client) GetClusterResources() ([]NodeResource, []VMResource, error) {
+func (c *Client) GetClusterResources() ([]Resource, error) {
 	rawData, err := c.getData("/cluster/resources")
-	if err != nil {
-		return nil, nil, err
-	}
-
-	nodeList, vmList, err := parseClusterResources(rawData)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return nodeList, vmList, nil
-}
-
-//GetNodeNetwork query the /nodes/<node name>/network URL on the Proxmox API
-func (c *Client) GetNodeNetwork(nodeName string) ([]NodeNetworkInterface, error) {
-	respBody, err := c.get("/nodes/" + nodeName + "/network")
 	if err != nil {
 		return nil, err
 	}
 
-	networkList, err := parseNodeNetwork(respBody)
+	var resList []Resource
+	for _, element := range rawData {
+		var res Resource
+		if err = json.Unmarshal(*element, &res); err != nil {
+			return nil, err
+		}
+		resList = append(resList, res)
+	}
+	return resList, err
+}
+
+//GetNodeNetwork query the /nodes/<node name>/network URL on the Proxmox API
+func (c *Client) GetNodeNetwork(nodeName string) ([]NodeNetworkInterface, error) {
+
+	rawData, err := c.getData("/nodes/" + nodeName + "/network")
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	return networkList, nil
+	var resList []NodeNetworkInterface
+	for _, element := range rawData {
+		var iface NodeNetworkInterface
+		if err = json.Unmarshal(*element, &iface); err != nil {
+			return nil, err
+		}
+		resList = append(resList, iface)
+	}
+
+	return resList, err
 }

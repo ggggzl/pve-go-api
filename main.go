@@ -24,17 +24,17 @@ func main() {
 		ForceAttemptHTTP2: true,
 	})
 
-	rawResults, err := pveClient.GetNodes()
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(rawResults)
-
-	resources, err := pveClient.GetRawResponse("/cluster/resources")
+	resources, err := pveClient.GetNodeNetwork("VMSRV01")
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println(resources)
+
+	res, err := pveClient.GetRawResponse("/cluster/resources")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(res)
 }
