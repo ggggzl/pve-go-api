@@ -1,0 +1,7 @@
+address: 192.0.2.12
+userid:
+  username: toto
+  idrealm: pve
+apitoken:
+  id: prometheus
+  token: AAAAABBBBBCCCCCDDDDD

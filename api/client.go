@@ -2,10 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 
-	"github.com/Funkit/pve-go-api/common"
 	"github.com/Funkit/pve-go-api/connection"
 )
 
@@ -25,59 +23,6 @@ func NewClient(i connection.Info, transportSettings *http.Transport) *Client {
 	}
 
 	return client
-}
-
-func tokenHeader(c connection.Info) string {
-	return "PVEAPIToken=" + c.UserID.Username + "@" + c.UserID.IDRealm + "!" + c.APIToken.ID + "=" + c.APIToken.Token
-}
-
-func newRequest(c connection.Info, targetURL string) (*http.Request, error) {
-	req, err := http.NewRequest(http.MethodGet, c.Address+targetURL, nil)
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Authorization", tokenHeader(c))
-	return req, nil
-}
-
-func (c *Client) get(url string) (responseBody []byte, err error) {
-	req, err := newRequest(c.info, url)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	respBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return respBody, nil
-}
-
-func (c *Client) getData(url string) ([]*json.RawMessage, error) {
-	req, err := newRequest(c.info, url)
-	if err != nil {
-		return nil, err
-	}
-
-	response, err := c.httpClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer response.Body.Close()
-
-	respBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	return common.GetRawData(respBody)
 }
 
 //GetRawResponse query the API endpoint and return a map containing the response body
