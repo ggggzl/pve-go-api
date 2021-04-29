@@ -48,7 +48,7 @@ type Resource struct {
 	RAM               int     `json:"mem"` // bytes
 	Status            string  `json:"status"`
 	Template          int     `json:"template,omitempty"`
-	Type              int     `json:"type,omitempty"`
+	Type              string  `json:"type,omitempty"`
 	Uptime            int     `json:"uptime"` // sec
 	VMID              int     `json:"vmid,omitempty"`
 }
