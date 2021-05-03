@@ -29,10 +29,12 @@ func main() {
 
 	fmt.Println(resources)
 
-	res, err := pveClient.GetRawResponse("/cluster/resources")
+	resList, err := pveClient.GetClusterResources()
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(res)
+	for _, res := range resList {
+		fmt.Println("STATUS:", res.Status)
+	}
 }

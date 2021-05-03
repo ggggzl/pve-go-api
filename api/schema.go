@@ -1,7 +1,5 @@
 package api
 
-import "encoding/json"
-
 //Node Node resource type at /nodes
 type Node struct {
 	Name           string `json:"node,omitempty"`
@@ -21,19 +19,6 @@ type NodeNetworkInterface struct {
 	CIDR          string   `json:"cidr"`
 	Families      []string `json:"families"`
 	Options       []string `json:"options"`
-}
-
-//ParseMap parse generic map into the object
-func (node *NodeNetworkInterface) ParseMap(element map[string]interface{}) error {
-	jsonbody, err := json.Marshal(element)
-	if err != nil {
-		return err
-	}
-
-	if err := json.Unmarshal([]byte(jsonbody), &node); err != nil {
-		return err
-	}
-	return nil
 }
 
 //Resource resource at /cluster/resources
