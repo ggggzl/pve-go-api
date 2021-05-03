@@ -7,6 +7,7 @@ import (
 
 	"github.com/Funkit/pve-go-api/api"
 	"github.com/Funkit/pve-go-api/connection"
+	"github.com/Funkit/pve-go-api/utils"
 )
 
 const secretsFilePath = "../secrets/secrets.yml"
@@ -22,19 +23,29 @@ func main() {
 		ForceAttemptHTTP2: true,
 	})
 
-	resources, err := pveClient.GetNodeNetwork("VMSRV01")
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(resources)
+	//resp, err := pveClient.GetRawResponse("/nodes/VMSRV02/qemu/280/firewall/rules")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//fmt.Println(resp)
 
 	resList, err := pveClient.GetClusterResources()
 	if err != nil {
 		panic(err)
 	}
 
-	for _, res := range resList {
-		fmt.Println("STATUS:", res.Status)
+	vm, err := utils.GetVM(resList, 280)
+	if err != nil {
+		panic(err)
 	}
+
+	fmt.Println(vm)
+
+	server1, err := utils.GetNode(resList, "VMSRV09")
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Println(server1)
 }
