@@ -95,3 +95,51 @@ func (c *Client) GetNodeNetwork(nodeName string) ([]NodeNetworkInterface, error)
 
 	return resList, err
 }
+
+//GetFirewallRules query the /nodes/<node name>/firewall/rules or the /nodes/<node name>/qemu/<VMID>/firewall/rules URL on the Proxmox API
+func (c *Client) GetFirewallRules(res Resource) ([]FirewallRule, error) {
+
+	var rawData []*json.RawMessage
+	var err error
+	if res.Type == TypeNode {
+		rawData, err = c.getData("/nodes/" + res.Node + "/firewall/rules")
+	}
+	if res.Type == TypeVM {
+		rawData, err = c.getData("/nodes/" + res.Node + "/" + res.ID + "/firewall/rules")
+	}
+
+	if err != nil {
+		return nil, err
+	}
+
+	var resList []FirewallRule
+	for _, element := range rawData {
+		var rule FirewallRule
+		if err = json.Unmarshal(*element, &rule); err != nil {
+			return nil, err
+		}
+		resList = append(resList, rule)
+	}
+
+	return resList, err
+}
+
+//GetClusterFirewallRules query the /nodes/<node name>/network URL on the Proxmox API
+func (c *Client) GetClusterFirewallRules(nodeName string) ([]FirewallRule, error) {
+
+	rawData, err := c.getData("/cluster/firewall/rules")
+	if err != nil {
+		return nil, err
+	}
+
+	var resList []FirewallRule
+	for _, element := range rawData {
+		var rule FirewallRule
+		if err = json.Unmarshal(*element, &rule); err != nil {
+			return nil, err
+		}
+		resList = append(resList, rule)
+	}
+
+	return resList, err
+}

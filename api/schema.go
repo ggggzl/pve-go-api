@@ -1,5 +1,10 @@
 package api
 
+const (
+	TypeVM   = "qemu"
+	TypeNode = "node"
+)
+
 //Node Node resource type at /nodes
 type Node struct {
 	Name           string `json:"node,omitempty"`

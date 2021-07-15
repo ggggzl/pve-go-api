@@ -1,11 +1,10 @@
 package api
 
 //FirewallRuleVM VM firewall rule following iptables-based firewall service
-type FirewallRuleVM struct {
+type FirewallRule struct {
 	//Mandatory
 	Action   string `json:"action"` //ACCEPT, DROP, REJECT or security group
-	VMID     string `json:"vmid"`
-	RuleType string `json:"type"` //in, out or group
+	RuleType string `json:"type"`   //in, out or group
 	//Optional
 	Comment          string `json:"comment"`
 	Destination      string `json:"dest"`
