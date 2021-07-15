@@ -22,19 +22,26 @@ func main() {
 		ForceAttemptHTTP2: true,
 	})
 
-	resources, err := pveClient.GetNodeNetwork("VMSRV01")
+	//resources, err := pveClient.GetNodeNetwork("VMSRV01")
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Println(resources)
+
+	//resList, err := pveClient.GetClusterResources()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//for _, res := range resList {
+	//	if res.Type == "qemu" {
+	//		fmt.Println(res.Name)
+	//	}
+	//}
+
+	result, err := pveClient.GetRawResponse("/nodes/VMSRV05/qemu/580/firewall/rules")
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(resources)
-
-	resList, err := pveClient.GetClusterResources()
-	if err != nil {
-		panic(err)
-	}
-
-	for _, res := range resList {
-		fmt.Println("STATUS:", res.Status)
-	}
+	fmt.Println(result)
 }
